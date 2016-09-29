@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Call Reminder</string>
+    <string name="stop_service">Stop Service</string>
+    <string name="start_service">Start Service</string>
+    <string name="set_timer">Set Timer</string>
+    <string name="heading">Call Reminder</string>
+    <string name="stop_reminder">Stop Reminder</string>
 </resources>

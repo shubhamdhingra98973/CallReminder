@@ -1,5 +1,6 @@
 package in.dhingra_shubham.currentcallhistory;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Service;
 import android.content.ComponentName;
@@ -11,8 +12,11 @@ import android.database.Cursor;
 import android.graphics.Typeface;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -29,25 +33,27 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
-    public  static int timeHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-    public  static int timeMinute = Calendar.getInstance().get(Calendar.MINUTE);
+    public static int timeHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+    public static int timeMinute = Calendar.getInstance().get(Calendar.MINUTE);
     DBHelper db;
-    TextView tv,tv2;
+    private int STORAGE_PERMISSION_CODE = 23;
+    TextView tv, tv2;
     Button btn1;
-    boolean isTimerSet=false;
+    boolean isTimerSet = false;
     ComponentName receiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         tv = (TextView) findViewById(R.id.text);
-        tv2=(TextView) findViewById(R.id.msg1);
+        tv2 = (TextView) findViewById(R.id.msg1);
         tv2.setText(timeHour + ":" + timeMinute);
-        isTimerSet=false;
+        isTimerSet = false;
         btn1 = (Button) findViewById(R.id.setbutton);
         Typeface face4 = Typeface.createFromAsset(getAssets(), "fonts/Sansation-BoldItalic.ttf");
         tv.setTypeface(face4);
-         receiver = new ComponentName(this, PhListener.class);
+        receiver = new ComponentName(this, PhListener.class);
 
         View.OnClickListener listener1 = new View.OnClickListener() {
             public void onClick(View view) {
@@ -65,15 +71,16 @@ public class MainActivity extends AppCompatActivity {
                     FragmentTransaction transaction = manager.beginTransaction();
                     transaction.add(fragment, Constants.TIME_PICKER);
                     transaction.commit();
-                isTimerSet=true;
+                    isTimerSet = true;
                 }
-        }};
+            }
+        };
         btn1.setOnClickListener(listener1);
     }
 
     class MyHandler extends Handler {
         @Override
-        public void handleMessage (Message msg){
+        public void handleMessage(Message msg) {
             Bundle bundle = msg.getData();
             timeHour = bundle.getInt(Constants.HOUR);
             timeMinute = bundle.getInt(Constants.MINUTE);
@@ -81,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
             setAlarm();
         }
     }
+
     private void setAlarm() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, timeHour);
@@ -89,13 +97,12 @@ public class MainActivity extends AppCompatActivity {
         PhListener.setTime_and_hour();
     }
 
-    public void stopService(View view)
-    {
+    public void stopService(View view) {
         Toast.makeText(MainActivity.this, "Reminder Cancelled", Toast.LENGTH_SHORT).show();
         PhListener.cancelReminder();
     }
-    public void enableBroadcastReceiver(View view)
-    {
+
+    public void enableBroadcastReceiver(View view) {
         PackageManager pm = this.getPackageManager();
         pm.setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
@@ -103,8 +110,7 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, "Service Start !!", Toast.LENGTH_SHORT).show();
     }
 
-    public void disableBroadcastReceiver(View view)
-    {
+    public void disableBroadcastReceiver(View view) {
         PhListener.cancelReminder();
         PackageManager pm = this.getPackageManager();
         pm.setComponentEnabledSetting(receiver,
